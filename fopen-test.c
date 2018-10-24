@@ -26,7 +26,11 @@ void readFileContents(char fileName[]){
     fclose(file_to_read);
 }
 
-// Check if file exists at local path
+void buildTargetStruct() {
+
+}
+
+// Checks if file exists at local path
 bool targetExistsLocally(char filePath[]) {
     if( access( filePath, F_OK ) != -1 ) {
         // struct stat attr;
@@ -38,13 +42,25 @@ bool targetExistsLocally(char filePath[]) {
     }
 }
 
-// /char urlPath[]
-bool canICurlIt() {
-    char curl[100] = "/usr/bin/curl";
+/* int dateModifiedOfRemotePath(struct target)
+path from the target struct is used as a url to get the remote file.
+process if forked, curl is called in the child process with flags that send response headers to stdout.
+Output is piped back into parent process and copied into a variable 'data'
+Function searches for the 'last-modified' header.
+The 'last-modified' header line is stripped and is converted from string -> time structs -> epoch timestamp
+and finally stored in the target struct ready for compaison to other targets.
+return 0 on sucess, else -1;
+TODO: 
+    - change input argument to a pointer to target struct,
+    - add robust error handling and add ignore on global 'ignore error flags'
+    - store timestamp in struct.
+*/
+int dateModifiedOfRemotePath(char urlPath[]) {
+    char curl[] = "/usr/bin/curl";
 
     int link[2];
     int pid;
-    char foo[4096];
+    char data[4096];
 
     if (pipe(link)==-1)
         die("pipe");
@@ -57,27 +73,59 @@ bool canICurlIt() {
         dup2 (link[1], STDOUT_FILENO);
         close(link[0]);
         close(link[1]);
-        execlp(curl, "curl", "curl", "-s", "-i", "-X", "HEAD", "https://socialtriggers.com/perfect-blog-post/", NULL);
+        execlp(curl, "curl", "curl", "-s", "-i", "-X", "HEAD", urlPath, NULL);
         die("execlp");
 
     } else {
         close(link[1]);
-        // int nbytes = read(link[0], foo, sizeof(foo));
-        read(link[0], foo, sizeof(foo));
+        read(link[0], data, sizeof(data));
         
+        char modified[] = "last-modified";
+        char dateTime[36];
+
         char *token;
-        token = strtok(foo, "\n");
+        token = strtok(data, "\n");
         
+        // Find 'last modified' amongst response data
         while( token != NULL ) {
-            printf("tkn %s\n", token );
+            if(strstr(token, modified) != NULL) {
+                // if found strip string down to datetime string
+                int todex = 0;
+                int tidex = 0;
+                while(token[todex] != ',') {
+                    todex++;
+                }
+
+                while(token[todex] != '\0') {    
+                    todex++;
+                    dateTime[tidex] = token[todex];
+                    tidex++;
+                }
+                // test to see datetime from 'last modified'
+                //printf("%s\n", dateTime);
+
+                // Create a time struct from the string...
+                struct tm tm;
+                int t;
+
+                if (strptime(dateTime, "%d %b %Y %H:%M:%S", &tm) == 0){
+                    // There was a error converting time to a strcut.
+                    printf("there was an error!");
+                } else {
+                    // if no errors with string to struct conversion, create an epoch timestamp.
+                    t = mktime(&tm);
+                    if (t == -1) {
+                        // There was an error converting time to a seconds 
+                    } else {
+                        // TODO: Store the timestamp within the Target Struct....
+                        printf("seconds since the Epoch: %ld\n", (long) t);
+
+                    }
+                }
+            }
             token = strtok(NULL, "\n");
         }
 
-        // struct stat attr;
-        // stat(foo, &attr);
-        // printf("Last modified time: %s", ctime(&attr.st_mtime));
-        // printf("Output: (%.*s)\n", nbytes, foo);
-        // strncmp(pre, str, strlen(pre)) == 0;
         wait(NULL);
 
     }
@@ -104,7 +152,7 @@ int main(int argc, char *argv[]){
 
     char bakepath[1024];
 
-    canICurlIt();
+    dateModifiedOfRemotePath("https://stackoverflow.com/questions/15334558/compiler-gets-warnings-when-using-strptime-function-c");
 
     if(argc < 2){
         // get cwd and open bakefile located there if no other arguments.
@@ -140,9 +188,6 @@ int main(int argc, char *argv[]){
                 readFileContents(bakepath);
             }
         }
-
-
-
     }
 
     return 0;
