@@ -30,7 +30,7 @@ void buildTargetStruct() {
 
 }
 
-// Check if file exists at local path
+// Checks if file exists at local path
 bool targetExistsLocally(char filePath[]) {
     if( access( filePath, F_OK ) != -1 ) {
         // struct stat attr;
@@ -42,13 +42,25 @@ bool targetExistsLocally(char filePath[]) {
     }
 }
 
-// /char urlPath[]
-bool canICurlIt() {
-    char curl[100] = "/usr/bin/curl";
+/* int dateModifiedOfRemotePath(struct target)
+path from the target struct is used as a url to get the remote file.
+process if forked, curl is called in the child process with flags that send response headers to stdout.
+Output is piped back into parent process and copied into a variable 'data'
+Function searches for the 'last-modified' header.
+The 'last-modified' header line is stripped and is converted from string -> time structs -> epoch timestamp
+and finally stored in the target struct ready for compaison to other targets.
+return 0 on sucess, else -1;
+TODO: 
+    - change input argument to a pointer to target struct,
+    - add robust error handling and add ignore on global 'ignore error flags'
+    - store timestamp in struct.
+*/
+int dateModifiedOfRemotePath(char urlPath[]) {
+    char curl[] = "/usr/bin/curl";
 
     int link[2];
     int pid;
-    char foo[4096];
+    char data[4096];
 
     if (pipe(link)==-1)
         die("pipe");
@@ -61,18 +73,18 @@ bool canICurlIt() {
         dup2 (link[1], STDOUT_FILENO);
         close(link[0]);
         close(link[1]);
-        execlp(curl, "curl", "curl", "-s", "-i", "-X", "HEAD", "https://en.cppreference.com/w/cpp/string/byte", NULL);
+        execlp(curl, "curl", "curl", "-s", "-i", "-X", "HEAD", urlPath, NULL);
         die("execlp");
 
     } else {
         close(link[1]);
-        // int nbytes = read(link[0], foo, sizeof(foo));
-        read(link[0], foo, sizeof(foo));
+        read(link[0], data, sizeof(data));
         
         char modified[] = "last-modified";
         char dateTime[36];
+
         char *token;
-        token = strtok(foo, "\n");
+        token = strtok(data, "\n");
         
         // Find 'last modified' amongst response data
         while( token != NULL ) {
@@ -89,7 +101,8 @@ bool canICurlIt() {
                     dateTime[tidex] = token[todex];
                     tidex++;
                 }
-                printf("%s\n", dateTime);
+                // test to see datetime from 'last modified'
+                //printf("%s\n", dateTime);
 
                 // Create a time struct from the string...
                 struct tm tm;
@@ -106,17 +119,13 @@ bool canICurlIt() {
                     } else {
                         // TODO: Store the timestamp within the Target Struct....
                         printf("seconds since the Epoch: %ld\n", (long) t);
+
                     }
                 }
             }
             token = strtok(NULL, "\n");
         }
 
-        // struct stat attr;
-        // stat(foo, &attr);
-        // printf("Last modified time: %s", ctime(&attr.st_mtime));
-        // printf("Output: (%.*s)\n", nbytes, foo);
-        // strncmp(pre, str, strlen(pre)) == 0;
         wait(NULL);
 
     }
@@ -141,45 +150,45 @@ int changeDirectory(char cdPath[]) {
 
 int main(int argc, char *argv[]){
 
-    // char bakepath[1024];
+    char bakepath[1024];
 
-    canICurlIt();
+    dateModifiedOfRemotePath("https://stackoverflow.com/questions/15334558/compiler-gets-warnings-when-using-strptime-function-c");
 
-    // if(argc < 2){
-    //     // get cwd and open bakefile located there if no other arguments.
-    //     if (getcwd(cwd, sizeof(cwd)) != NULL) {
-    //         if(targetExistsLocally("bakefile.txt")) {
-    //             printf("Target Exists Locally \n");
-    //             readFileContents(strcpy(cwd, "bakefile.txt"));
-    //         } else {
-    //             printf("Target doesn't exist!");
-    //         }
-    //     } else {
-    //         printf("Fail to find a Bakefile...\n");
-    //         printf("Please provied a path to your Bakefile or create one in this directory\n");
-    //         perror("getcwd() error");
-    //         return 1;
-    //     }
-    //     return 1;
-    // } else {
+    if(argc < 2){
+        // get cwd and open bakefile located there if no other arguments.
+        if (getcwd(cwd, sizeof(cwd)) != NULL) {
+            if(targetExistsLocally("bakefile.txt")) {
+                printf("Target Exists Locally \n");
+                readFileContents(strcpy(cwd, "bakefile.txt"));
+            } else {
+                printf("Target doesn't exist!");
+            }
+        } else {
+            printf("Fail to find a Bakefile...\n");
+            printf("Please provied a path to your Bakefile or create one in this directory\n");
+            perror("getcwd() error");
+            return 1;
+        }
+        return 1;
+    } else {
         
-    //     // if change directory command then CD
-    //     for(int index = 1; index < argc; index++) {
-    //         if(strcmp(argv[index], "-C") == 0) {
-    //             if(changeDirectory(argv[index+1]) == 1){
-    //                 printf("Path argument to -C is not valid");
-    //                 return 1;
-    //             }
-    //         }
-    //         if(strcmp(argv[index], "-f") == 0) {
-    //             printf("-f");
-    //             strcpy(argv[index+1], bakepath);
-    //             printf("%s", bakepath);
-    //             printf("execute on bake path");
-    //             readFileContents(bakepath);
-    //         }
-    //     }
-    // }
+        // if change directory command then CD
+        for(int index = 1; index < argc; index++) {
+            if(strcmp(argv[index], "-C") == 0) {
+                if(changeDirectory(argv[index+1]) == 1){
+                    printf("Path argument to -C is not valid");
+                    return 1;
+                }
+            }
+            if(strcmp(argv[index], "-f") == 0) {
+                printf("-f");
+                strcpy(argv[index+1], bakepath);
+                printf("%s", bakepath);
+                printf("execute on bake path");
+                readFileContents(bakepath);
+            }
+        }
+    }
 
     return 0;
 }
