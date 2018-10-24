@@ -26,6 +26,10 @@ void readFileContents(char fileName[]){
     fclose(file_to_read);
 }
 
+void buildTargetStruct() {
+
+}
+
 // Check if file exists at local path
 bool targetExistsLocally(char filePath[]) {
     if( access( filePath, F_OK ) != -1 ) {
@@ -57,7 +61,7 @@ bool canICurlIt() {
         dup2 (link[1], STDOUT_FILENO);
         close(link[0]);
         close(link[1]);
-        execlp(curl, "curl", "curl", "-s", "-i", "-X", "HEAD", "https://socialtriggers.com/perfect-blog-post/", NULL);
+        execlp(curl, "curl", "curl", "-s", "-i", "-X", "HEAD", "https://en.cppreference.com/w/cpp/string/byte", NULL);
         die("execlp");
 
     } else {
@@ -65,11 +69,46 @@ bool canICurlIt() {
         // int nbytes = read(link[0], foo, sizeof(foo));
         read(link[0], foo, sizeof(foo));
         
+        char modified[] = "last-modified";
+        char dateTime[36];
         char *token;
         token = strtok(foo, "\n");
         
+        // Find 'last modified' amongst response data
         while( token != NULL ) {
-            printf("tkn %s\n", token );
+            if(strstr(token, modified) != NULL) {
+                // if found strip string down to datetime string
+                int todex = 0;
+                int tidex = 0;
+                while(token[todex] != ',') {
+                    todex++;
+                }
+
+                while(token[todex] != '\0') {    
+                    todex++;
+                    dateTime[tidex] = token[todex];
+                    tidex++;
+                }
+                printf("%s\n", dateTime);
+
+                // Create a time struct from the string...
+                struct tm tm;
+                int t;
+
+                if (strptime(dateTime, "%d %b %Y %H:%M:%S", &tm) == 0){
+                    // There was a error converting time to a strcut.
+                    printf("there was an error!");
+                } else {
+                    // if no errors with string to struct conversion, create an epoch timestamp.
+                    t = mktime(&tm);
+                    if (t == -1) {
+                        // There was an error converting time to a seconds 
+                    } else {
+                        // TODO: Store the timestamp within the Target Struct....
+                        printf("seconds since the Epoch: %ld\n", (long) t);
+                    }
+                }
+            }
             token = strtok(NULL, "\n");
         }
 
@@ -102,48 +141,45 @@ int changeDirectory(char cdPath[]) {
 
 int main(int argc, char *argv[]){
 
-    char bakepath[1024];
+    // char bakepath[1024];
 
     canICurlIt();
 
-    if(argc < 2){
-        // get cwd and open bakefile located there if no other arguments.
-        if (getcwd(cwd, sizeof(cwd)) != NULL) {
-            if(targetExistsLocally("bakefile.txt")) {
-                printf("Target Exists Locally \n");
-                readFileContents(strcpy(cwd, "bakefile.txt"));
-            } else {
-                printf("Target doesn't exist!");
-            }
-        } else {
-            printf("Fail to find a Bakefile...\n");
-            printf("Please provied a path to your Bakefile or create one in this directory\n");
-            perror("getcwd() error");
-            return 1;
-        }
-        return 1;
-    } else {
+    // if(argc < 2){
+    //     // get cwd and open bakefile located there if no other arguments.
+    //     if (getcwd(cwd, sizeof(cwd)) != NULL) {
+    //         if(targetExistsLocally("bakefile.txt")) {
+    //             printf("Target Exists Locally \n");
+    //             readFileContents(strcpy(cwd, "bakefile.txt"));
+    //         } else {
+    //             printf("Target doesn't exist!");
+    //         }
+    //     } else {
+    //         printf("Fail to find a Bakefile...\n");
+    //         printf("Please provied a path to your Bakefile or create one in this directory\n");
+    //         perror("getcwd() error");
+    //         return 1;
+    //     }
+    //     return 1;
+    // } else {
         
-        // if change directory command then CD
-        for(int index = 1; index < argc; index++) {
-            if(strcmp(argv[index], "-C") == 0) {
-                if(changeDirectory(argv[index+1]) == 1){
-                    printf("Path argument to -C is not valid");
-                    return 1;
-                }
-            }
-            if(strcmp(argv[index], "-f") == 0) {
-                printf("-f");
-                strcpy(argv[index+1], bakepath);
-                printf("%s", bakepath);
-                printf("execute on bake path");
-                readFileContents(bakepath);
-            }
-        }
-
-
-
-    }
+    //     // if change directory command then CD
+    //     for(int index = 1; index < argc; index++) {
+    //         if(strcmp(argv[index], "-C") == 0) {
+    //             if(changeDirectory(argv[index+1]) == 1){
+    //                 printf("Path argument to -C is not valid");
+    //                 return 1;
+    //             }
+    //         }
+    //         if(strcmp(argv[index], "-f") == 0) {
+    //             printf("-f");
+    //             strcpy(argv[index+1], bakepath);
+    //             printf("%s", bakepath);
+    //             printf("execute on bake path");
+    //             readFileContents(bakepath);
+    //         }
+    //     }
+    // }
 
     return 0;
 }
