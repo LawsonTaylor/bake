@@ -4,6 +4,47 @@
 char cli_options[6][2] = {"-C", "-f", "-i", "-n", "-p", "-s"};
 char cwd[200];
 
+struct Targets {
+   char  name[80];
+   struct target *dependencies[100];
+   struct target *parents[10];
+   bool build;
+   char *actions[100];
+   long modificationDate;
+} target;
+
+// returns index to splice to for target if exists, else -1;
+int isTargetLine(char line[]){
+    int i = 0;
+    while(line[i] != ':' && line[i] != '\0') {
+        i++;
+    }
+    if(line[i] == '\0'){
+        return -1;
+    } else {
+        return i-1;
+    }
+}
+
+int buildTarget(int i, char line[]) {
+    // Get target name
+    char targetName[80];
+    int x = 0;
+    while(x != i){
+        targetName[x] = line[x];
+        x++;
+    }
+    printf("Got the target Name: %s \n", targetName);
+    // Create Struct
+    
+    // add name
+
+    // check if it exists and get date modified
+
+    // add date modified to struct
+    return 0;
+}
+
 void readFileContents(char fileName[]){
      
     FILE *file_to_read = fopen(fileName, "r" );
@@ -37,8 +78,20 @@ void readFileContents(char fileName[]){
             continue;
         }
 
-        printf("%s", stor);
+        printf("%s \n", stor);
         stor[0] = '\0'; // set first postition to null byte
+
+        // Will be moved to second read //
+        // if newTarget set globalTarget as newTarget
+        //      read line, check 
+        //      if dependency exits { add dependency by pointer }
+        //      else { create dependency } => create dependency() { modification date, name/path }
+        // if action line
+        //      add action to target
+        int spliceTargetIndex = isTargetLine(line);
+        if(spliceTargetIndex != -1){
+            getTargetName(spliceTargetIndex, line);
+        } 
     }
 
     fclose(file_to_read);

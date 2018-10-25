@@ -2,6 +2,8 @@ this\
 is\
 the 
 #test
+TargetLine  : deps
 Bakefile
 #more stuff \
 anot
+AnotherTarget : this
