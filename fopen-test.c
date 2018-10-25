@@ -10,7 +10,7 @@ void readFileContents(char fileName[]){
         printf("One of the files failed. :(");
     }
  
- char line[120];
+    char line[120];
     bool iscont = false;
     char stor[360];   // init the size of array you need
     char pre[90];
@@ -227,7 +227,10 @@ int main(int argc, char *argv[]){
                 if(changeDirectory(argv[index+1]) == 1){
                     printf("Path argument to -C is not valid");
                     return 1;
-                }
+                    }
+		 else {
+	            cd argv[index+1]; 
+		 }
             }
             if(strcmp(argv[index], "-f") == 0) {
                 printf("-f");
