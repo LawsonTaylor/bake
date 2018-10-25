@@ -1,5 +1,10 @@
+//Can you take a look at line 95?
+
+
 char cli_options[6][2] = {"-C", "-f", "-i", "-n", "-p", "-s"};
 char cwd[200];
+char trueline[1000];
+int tlindex = 0;
 
 void readFileContents(char fileName[]){
      
@@ -69,9 +74,55 @@ void readFileContents(char fileName[]){
 
         printf("%s", stor);
         stor[0] = '\0'; // set first postition to null byte
+	trueline[tlindex] = stor;
+	tlindex++;
     }
 
     fclose(file_to_read);
+}
+void readNvariant(char fileName[]){
+     
+    FILE *file_to_read = fopen(fileName, "r" );
+    //FILE *file_to_write = fopen("newFile.txt", "w");
+ 
+    if(file_to_read == NULL){
+        printf("One of the files failed. :(");
+    }
+ 
+    char line[120];
+    bool iscont = false;
+    char c[100]; //just a transfer variable
+	while(fgets(line, 120, file_to_read) != NULL){
+	if (isInArray(58, line) == true) { .   //finding the :
+	    iscont = true;
+	    continue;			  
+	    }
+		
+	if (iscont == true) {	
+	    if (line[0] == '\t') {
+	       iscont = true;
+	       if (isInArray('@', line) == true) {
+		       continue;
+	       }
+               int index = (line.indexOf(32) >= 0); //Looking for the first space
+	       int d = index;
+	       while (d < strlen(line) {
+	       c[d-index] = line[d];		
+	       d++; 
+	       }
+		      }
+	   printf("%s", c);      
+	   else {
+	       iscont = false;
+	       continue;
+	   }
+	else {
+		continue;
+	      }
+	
+	}
+	fclose(file_to_read);
+
 }
 
 
@@ -239,6 +290,12 @@ int main(int argc, char *argv[]){
                 printf("execute on bake path");
                 readFileContents(bakepath);
             }
+	   if(strcmp(argv[index], "-n") == 0) {
+                printf("-f");
+                strcpy(argv[index+1], bakepath);
+                printf("%s", bakepath);
+                printf("execute on bake path");
+                readNvariant(bakepath);
         }
     }
 
