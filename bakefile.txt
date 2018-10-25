@@ -1,7 +1,8 @@
 this\
 is\
 the 
+a=b
 #test
 Bakefile
 #more stuff \
-anot
+b b bb
