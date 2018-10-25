@@ -13,18 +13,30 @@ void readFileContents(char fileName[]){
         printf("One of the files failed. :(");
     }
  
-    char line[120];
- 
+   char line[120];
+    bool iscont = false;
+    char stor = \0;    
+
     while(fgets(line, 120, file_to_read) != NULL){
-        // ignore comments
-        if(line[0] == '#'){
+        
+    if (iscont == true) {
+        if(line[strlen(Line)-1] == '\') {
+        strcpy (stor,line)  
+        iscont = true;
           continue;
         }
-        printf("%s", line);
+        else {
+         strcpy (stor,line)
+         iscont = false;           
+        }
+         // ignore comments
+        if(stor[0] == '#'){
+          continue;
+        }
+       
+        printf("%s", stor);
+        stor = \0;
     }
- 
-    fclose(file_to_read);
-}
 
 void buildTargetStruct() {
 
