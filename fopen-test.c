@@ -1,6 +1,3 @@
-#include "Headerfile.h"
-
-
 char cli_options[6][2] = {"-C", "-f", "-i", "-n", "-p", "-s"};
 char cwd[200];
 
