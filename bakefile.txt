@@ -4,6 +4,10 @@ the
 #test
 TargetLine  : deps
 Bakefile
+https:// Some stuff : an then deps
+key = value;
+this is a key insn't it;
 #more stuff \
 anot
+file:// Targetfile : an it's deps
 AnotherTarget : this

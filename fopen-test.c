@@ -4,19 +4,37 @@
 char cli_options[6][2] = {"-C", "-f", "-i", "-n", "-p", "-s"};
 char cwd[200];
 
-struct Targets {
-   char  name[80];
+
+struct Target {
+   char *name;
    struct target *dependencies[100];
    struct target *parents[10];
    bool build;
    char *actions[100];
    long modificationDate;
-} target;
+};
 
+bool targetIsRemote(char targetName[]){
+    if(strstr(targetName, "file://") != NULL) {
+        return true;
+    } 
+    if(strstr(targetName, "http://") != NULL) {
+        return true;
+    } 
+    if(strstr(targetName, "https://") != NULL) {
+        return true;
+    } else {
+        return false;
+    }
+}
+struct Target *TargetList[100];
+int noTargets = 0;
 // returns index to splice to for target if exists, else -1;
 int isTargetLine(char line[]){
     int i = 0;
     while(line[i] != ':' && line[i] != '\0') {
+        // FIX THIS SO : REQUIRES SPACE LEFT AND RIGHT TO ACCOUNT FOR URLS, ETC
+        if()
         i++;
     }
     if(line[i] == '\0'){
@@ -34,14 +52,21 @@ int buildTarget(int i, char line[]) {
         targetName[x] = line[x];
         x++;
     }
-    printf("Got the target Name: %s \n", targetName);
     // Create Struct
-    
-    // add name
+    struct Target *ptr = malloc(sizeof *ptr);
+    TargetList[noTargets] = ptr;
 
+    // // add name
+    printf("%s", strdup(targetName));
+    ptr->name = strdup(targetName);
+    printf("Got the target Name: %s \n", ptr->name);
     // check if it exists and get date modified
+    // if(targetIsRemote()) {
 
-    // add date modified to struct
+    // } else {
+    //     targetExistsLocally(ptr->name);
+    // }
+    // // add date modified to struct
     return 0;
 }
 
@@ -89,8 +114,14 @@ void readFileContents(char fileName[]){
         // if action line
         //      add action to target
         int spliceTargetIndex = isTargetLine(line);
+        // is a new Target
         if(spliceTargetIndex != -1){
-            getTargetName(spliceTargetIndex, line);
+            buildTarget(spliceTargetIndex, line);
+            if(targetIsRemote(TargetList[noTargets]->name)){
+                printf("Is a remote!\n");
+            } else {
+                printf("Not a remote!\n");
+            }
         } 
     }
 
