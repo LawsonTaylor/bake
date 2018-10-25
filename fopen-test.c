@@ -33,16 +33,16 @@ void buildTargetStruct() {
 // Checks if file exists at local path
 bool targetExistsLocally(char filePath[]) {
     if( access( filePath, F_OK ) != -1 ) {
-        // struct stat attr;
-        // stat(filePath, &attr);
-        // printf("Last modified time: %s", ctime(&attr.st_mtime));
+        struct stat attr;
+        stat(filePath, &attr);
+        printf("Last modified time: %ld \n", attr.st_mtime);
         return true;
     } else {
         return false;
     }
 }
 
-/* int dateModifiedOfRemotePath(struct target)
+/* int dateModifiedOfRemotePath(struct target t)
 path from the target struct is used as a url to get the remote file.
 process if forked, curl is called in the child process with flags that send response headers to stdout.
 Output is piped back into parent process and copied into a variable 'data'
