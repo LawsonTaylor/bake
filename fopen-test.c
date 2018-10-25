@@ -13,33 +13,39 @@ void readFileContents(char fileName[]){
         printf("One of the files failed. :(");
     }
  
-   char line[120];
+    char line[120];
     bool iscont = false;
-    char stor = \0;    
+    char stor[360];   // init the size of array you need
 
     while(fgets(line, 120, file_to_read) != NULL){
         
-    if (iscont == true) {
-        if(line[strlen(Line)-1] == '\') {
-        strcpy (stor,line)  
-        iscont = true;
-          continue;
+        if(line[strlen(line)-2] == 92) { // escape the '\' char
+            line[strlen(line)-2] = ' '; // replace '\' with a space
+            strtok(line, "\n"); // remove newline char
+            strcat(stor, line); //string cat here
+            iscont = true;
+            continue;
         }
-        else {
-         strcpy (stor,line)
-         iscont = false;           
+        if (iscont == true) {
+            strcat(stor, line); // string cat
+            iscont = false;
+        } else {
+            strcpy(stor, line);       
         }
-         // ignore comments
+        // ignore comments
         if(stor[0] == '#'){
-          continue;
+            continue;
         }
-       
+
         printf("%s", stor);
-        stor = \0;
+        stor[0] = '\0'; // set first postition to null byte
     }
 
-void buildTargetStruct() {
+    fclose(file_to_read);
+}
 
+void buildTargetStruct(){
+    printf("build target struct!");
 }
 
 // Checks if file exists at local path
