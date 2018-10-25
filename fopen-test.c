@@ -48,7 +48,8 @@ void readFileContents(char fileName[]){
                pre1[c] = string[c];
                c++;
             }
-            while (c < strlen(line)) {
+	    c++;
+            while (c <= strlen(line)) {
 	       post1[c] = string[c];
 	       c++;
 	    }
@@ -62,8 +63,7 @@ void readFileContents(char fileName[]){
            for (char* p = line; p = strchr(p, pre[e]); ++p) {
              *p = post[e];
            }
-	   //I'm not sure if thats how you pull values out of a 2x array
-	   //also i dont think this works at all so i'll rewrite it with iterating
+	   //i dont think this works at all so i'll rewrite it with iterating
 	   //through the positions and stuff
        }
 
