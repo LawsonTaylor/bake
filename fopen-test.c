@@ -10,9 +10,11 @@ void readFileContents(char fileName[]){
         printf("One of the files failed. :(");
     }
  
-    char line[120];
+ char line[120];
     bool iscont = false;
     char stor[360];   // init the size of array you need
+    char swap[90][90];
+    int d = 0; //index for swap
 
     while(fgets(line, 120, file_to_read) != NULL){
         
@@ -33,6 +35,35 @@ void readFileContents(char fileName[]){
         if(stor[0] == '#'){
             continue;
         }
+        //The swap function
+	char pre[90];
+	char post[90];
+	
+	//Adding the pre and post values to swap
+	if (isInArray(61, line) == true) {
+            int index = (line.indexOf(61) >= 0);
+	    int c = 0;
+            while (c < index) {
+               pre[c] = string[c];
+               c++;
+            }
+            while (c < strlen(line)) {
+	       post[c] = string[c];
+	       c++;
+	    }
+            char arr[d][d] = pre,post; //This doesn't look right to me
+	    d++;
+	}
+
+        //Actively replacing pre with post
+       While (e = 0, e =< d, e++;) {
+           for (char* p = line; p = strchr(p, swap[e][]); ++p) {
+             *p = swap[][e];
+           }
+	   //I'm not sure if thats how you pull values out of a 2x array
+	   //also i dont think this works at all so i'll rewrite it with iterating
+	   //through the positions and stuff
+       }
 
         printf("%s", stor);
         stor[0] = '\0'; // set first postition to null byte
@@ -40,6 +71,7 @@ void readFileContents(char fileName[]){
 
     fclose(file_to_read);
 }
+
 
 void buildTargetStruct(){
     printf("build target struct!");
