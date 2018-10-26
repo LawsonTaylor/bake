@@ -8,3 +8,128 @@ hwpa moew kinwa
 #
 lora os qords
 more words
+
+
+
+
+
+
+int secondRead(){
+    // Will be moved to second read //
+    // if newTarget set globalTarget as newTarget
+    //      read line, check 
+    //      if dependency exits { add dependency by pointer }
+    //      else { create dependency } => create dependency() { modification date, name/path }
+    // if action line
+    //      add action to target
+    // int spliceTargetIndex = isTargetLine(line);
+    // // is a new Target
+    // if(spliceTargetIndex != -1){
+    //     buildTarget(spliceTargetIndex, line);
+    // check if variable line
+    if(isVariabeDef(stor)){
+        printf("var");
+    } else {
+        printf("Not a var");
+    }
+    // } 
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+bool isVariabeDef(char ln[]){
+    int vli = 0;
+    while(ln[vli] != '\0'){
+        if(ln[vli] == '='){
+            vli = 0;
+            return true;
+        }
+    }
+    vli = 0;
+    return false;
+}
+
+void readFileContents(char fileName[]){
+    printf("readFC");
+     
+    FILE *file_to_read = fopen(fileName, "r" );
+    FILE *file_to_write = fopen("tempBake.txt", "w");
+ 
+    if(file_to_read == NULL){
+        printf("Failed to read Bakefile!");
+    }
+    if(file_to_write == NULL){
+        printf("Failed to write temp Bakefile!");
+    }
+ 
+    char line[120];
+    bool iscont = false;
+    char stor[360];   // init the size of array you need
+
+    while(fgets(line, 120, file_to_read) != NULL){
+        
+        if(line[strlen(line)-2] == 92) { // escape the '\' char
+            line[strlen(line)-2] = ' '; // replace '\' with a space
+            strtok(line, "\n"); // remove newline char
+            strcat(stor, line); //string cat here
+            iscont = true;
+            continue;
+        }
+
+        if (iscont == true) {
+            strcat(stor, line); // string cat
+            iscont = false;
+        } else {
+            strcpy(stor, line);       
+        }
+
+        // ignore comments
+        if(stor[0] == '#'){
+            continue;
+        }
+
+        // check if variable line
+        if(isVariabeDef(stor)){
+            printf("var");
+        } else {
+            printf("Not a var");
+        }
+
+        printf("%s \n", stor);
+        stor[0] = '\0'; // set first postition to null byte
+
+    }
+
+    fclose(file_to_read);
+    fclose(file_to_write);
+}
+
+int secondRead(){
+    // Will be moved to second read //
+    // if newTarget set globalTarget as newTarget
+    //      read line, check 
+    //      if dependency exits { add dependency by pointer }
+    //      else { create dependency } => create dependency() { modification date, name/path }
+    // if action line
+    //      add action to target
+    // int spliceTargetIndex = isTargetLine(line);
+    // // is a new Target
+    // if(spliceTargetIndex != -1){
+    //     buildTarget(spliceTargetIndex, line);
+    // check if variable line
+    if(isVariabeDef(stor)){
+        printf("var");
+    } else {
+        printf("Not a var");
+    }
+    // } 
+    return 0;
+}

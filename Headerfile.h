@@ -1,8 +1,9 @@
 #define _XOPEN_SOURCE
+#define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <string.h> 
+#include<string.h> 
 #include <stdbool.h> 
 #include <errno.h>
 #include <time.h>
@@ -14,7 +15,6 @@
 
 
 // Global functions and Variables
-extern int  currentln;
 extern bool ingnoreFailure;
 extern bool printRepresentation;
 extern bool printCommand;

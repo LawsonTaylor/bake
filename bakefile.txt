@@ -3,6 +3,12 @@ is\
 the 
 a=b
 #test
+TargetLine  : deps
 Bakefile
+https://www.researchnow.com : an then deps
+   key =    value;
+this is a key insn't it;
 #more stuff \
-b b bb
+anot
+file:// Targetfile : an it's deps
+AnotherTarget : this
