@@ -1,6 +1,7 @@
 this\
 is\
 the 
+a=b
 #test
 TargetLine  : deps
 Bakefile

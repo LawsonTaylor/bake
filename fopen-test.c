@@ -8,6 +8,8 @@
 
 char cli_options[6][2] = {"-C", "-f", "-i", "-n", "-p", "-s"};
 char cwd[200];
+char trueline[1000];
+int tlindex = 0;
 
 
 struct Target {
@@ -399,7 +401,7 @@ int main(int argc, char *argv[]){
         return 1;
     } else {
         
-        // if change directory command then CD
+// if change directory command then CD
         for(int index = 1; index < argc; index++) {
             if(strcmp(argv[index], "-C") == 0) {
                 if(changeDirectory(argv[index+1]) == 1){
