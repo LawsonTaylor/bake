@@ -15,7 +15,6 @@
 
 
 // Global functions and Variables
-extern int  currentln;
 extern bool ingnoreFailure;
 extern bool printRepresentation;
 extern bool printCommand;
